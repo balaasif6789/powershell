@@ -1,0 +1,87 @@
+Powershell modules
+
+
+Import-Module C:\Pathtomodule\modulename.psm1
+
+PSModule path
+$env:PSModulePath
+
+
+Copy the module inside the PSModule path 
+directly run the command Import-Module name of module      ( no need to enter the path. From Powershell 3.0 onwards there is no need to call Import-Module if the module is inside the PSModule path
+
+copy .\module.ps1 .\module.psm1          (converting a regular script to powershell module)
+
+
+
+
+
+
+
+
+
+
+
+
+Get-ExecutionPolicy
+
+
+PS G:\> function paramadd {$args[0] + $args[1]}
+PS G:\> paramadd
+PS G:\> paramadd 3 4
+7
+
+
+PS G:\> function multiply ($num1,$num2,$num3){$num1*$num2-$num3}
+PS G:\> multiply 3 4 2
+10
+
+
+
+
+
+function Get-ByOwner
+ {
+   Get-ChildItem -recurse C:\ | get-acl | where {$_.Owner -match $args[0]} 
+ }
+
+PS C:\> Get-ByOwner JackFrost
+
+
+
+WMI objects
+
+# Computer System
+$ComputerSystem = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName
+# Operating System
+$OperatingSystem = Get-WmiObject -Class win32_OperatingSystem -ComputerName $ComputerName
+# BIOS
+$Bios = Get-WmiObject -class win32_BIOS -ComputerName $ComputerName
+
+
+Powershell split command 
+
+$filename = "sample.cfg"
+
+Get-Content $filename | ForEach-Object {
+    $_.split(":")[1]
+}
+
+
+Getting a list of excel files and printing only the name of the file. 
+
+ Get-ChildItem -File -Name -Recurse |  ForEach-Object {$_.split("\")[1]} >                                                
+
+ 
+Get-Command -CommandType cmdlet -ParameterName Computername
+
+
+
+
+Imp links:
+
+Good powershell scripts
+https://lazywinadmin.com/p/scripts.html
+
+https://github.com/lazywinadmin/PowerShell
+https://github.com/nickrod518/PowerShell-Scripts
