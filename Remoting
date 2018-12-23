@@ -1,0 +1,114 @@
+PS C:\Users\asif> Get-HotFix -ComputerName asif-PC -Credential asif
+
+
+PS C:\Users\asif> Get-Command -CommandType cmdlet |Get-Member
+
+
+   TypeName: System.Management.Automation.CmdletInfo
+
+Name                MemberType     Definition
+----                ----------     ----------
+Equals              Method         bool Equals(System.Object obj)
+GetHashCode         Method         int GetHashCode()
+GetType             Method         type GetType()
+ToString            Method         string ToString()
+CommandType         Property       System.Management.Automation.CommandTypes CommandType {get;}
+DefaultParameterSet Property       System.String DefaultParameterSet {get;}
+Definition          Property       System.String Definition {get;}
+HelpFile            Property       System.String HelpFile {get;}
+ImplementingType    Property       System.Type ImplementingType {get;}
+Module              Property       System.Management.Automation.PSModuleInfo Module {get;}
+ModuleName          Property       System.String ModuleName {get;}
+Name                Property       System.String Name {get;}
+Noun                Property       System.String Noun {get;}
+OutputType          Property       System.Collections.ObjectModel.ReadOnlyCollection`1[[System.Management.Automation...
+Parameters          Property       System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0...
+ParameterSets       Property       System.Collections.ObjectModel.ReadOnlyCollection`1[[System.Management.Automation...
+PSSnapIn            Property       System.Management.Automation.PSSnapInInfo PSSnapIn {get;}
+Verb                Property       System.String Verb {get;}
+Visibility          Property       System.Management.Automation.SessionStateEntryVisibility Visibility {get;set;}
+DLL                 ScriptProperty System.Object DLL {get=$this.ImplementingType.Assembly.Location;}
+HelpUri             ScriptProperty System.Object HelpUri {get=try...
+
+
+PS C:\Users\asif> foreach ($pc in ('asif-PC' , 'localhost')) {Test-Connection $pc }
+
+Source        Destination     IPV4Address      IPV6Address                              Bytes    Time(ms)
+------        -----------     -----------      -----------                              -----    --------
+ASIF-PC       asif-PC         192.168.110.1    fe80::fc3f:33db:6b7f:4b58%16             32       0
+ASIF-PC       asif-PC         192.168.110.1    fe80::fc3f:33db:6b7f:4b58%16             32       0
+ASIF-PC       asif-PC         192.168.110.1    fe80::fc3f:33db:6b7f:4b58%16             32       0
+ASIF-PC       asif-PC         192.168.110.1    fe80::fc3f:33db:6b7f:4b58%16             32       0
+ASIF-PC       localhost       127.0.0.1        ::1                                      32       0
+ASIF-PC       localhost       127.0.0.1        ::1                                      32       0
+ASIF-PC       localhost       127.0.0.1        ::1                                      32       0
+ASIF-PC       localhost       127.0.0.1        ::1                                      32       0
+
+
+
+
+
+check for pass the hash fix    KB2871997
+
+
+if the attackers machine is not connected to the same domain as the target domain then some configuration has to be made on the attackers machine. 
+If on the same machine then no configuration is to be made.
+
+
+
+Attacker machine is to be instructed to trust the remote network.
+
+***************************************************************************************************************************
+
+PS C:\Windows\system32> Set-Item WSMan:\localhost\client\trustedhosts -Value *
+
+WinRM Security Configuration.
+This command modifies the TrustedHosts list for the WinRM client. The computers in the TrustedHosts list might not be
+authenticated. The client might send credential information to these computers. Are you sure that you want to modify
+this list?
+[Y] Yes  [N] No  [S] Suspend  [?] Help (default is "Y"): Y
+Set-Item : Access is denied.
+At line:1 char:9
++ Set-Item <<<<  WSMan:\localhost\client\trustedhosts -Value *
+    + CategoryInfo          : NotSpecified: (:) [Set-Item], InvalidOperationException
+    + FullyQualifiedErrorId : System.InvalidOperationException,Microsoft.PowerShell.Commands.SetItemCommand
+
+	
+	Solution to the error is to set the Network type to Private or Home. It should not be public
+	
+	
+***************************************************************************************************************************
+
+
+	PS C:\Windows\system32> Enable-PSRemoting -Force
+WinRM already is set up to receive requests on this machine.
+WinRM has been updated for remote management.
+Created a WinRM listener on HTTP://* to accept WS-Man requests to any IP on this machine.
+WinRM firewall exception enabled.
+
+PS C:\Windows\system32> Set-Item WSMan:\localhost\client\trustedhosts -Value *
+
+WinRM Security Configuration.
+This command modifies the TrustedHosts list for the WinRM client. The computers in the TrustedHosts list might not be
+authenticated. The client might send credential information to these computers. Are you sure that you want to modify
+this list?
+[Y] Yes  [N] No  [S] Suspend  [?] Help (default is "Y"): Y
+PS C:\Windows\system32>
+
+
+
+PS C:\Windows\system32> Get-Item wsman:\localhost\client\trustedhosts
+
+
+   WSManConfig: Microsoft.WSMan.Management\WSMan::localhost\Client
+
+Name                      Value                                                             Type
+----                      -----                                                             ----
+TrustedHosts              *                                                                 System.String
+
+
+
+
+PS C:\Windows\system32> Invoke-Command -ScriptBlock {Get-Process} -ComputerName IE8WIN7 -Credential IEUser
+
+PS C:\Windows\system32> Invoke-Command -ScriptBlock {$env:Computername} -ComputerName IE8WIN7 -Credential IEUser
