@@ -58,26 +58,8 @@ If on the same machine then no configuration is to be made.
 
 Attacker machine is to be instructed to trust the remote network.
 
-***************************************************************************************************************************
 
-PS C:\Windows\system32> Set-Item WSMan:\localhost\client\trustedhosts -Value *
-
-WinRM Security Configuration.
-This command modifies the TrustedHosts list for the WinRM client. The computers in the TrustedHosts list might not be
-authenticated. The client might send credential information to these computers. Are you sure that you want to modify
-this list?
-[Y] Yes  [N] No  [S] Suspend  [?] Help (default is "Y"): Y
-Set-Item : Access is denied.
-At line:1 char:9
-+ Set-Item <<<<  WSMan:\localhost\client\trustedhosts -Value *
-    + CategoryInfo          : NotSpecified: (:) [Set-Item], InvalidOperationException
-    + FullyQualifiedErrorId : System.InvalidOperationException,Microsoft.PowerShell.Commands.SetItemCommand
-
-	
-	Solution to the error is to set the Network type to Private or Home. It should not be public
-	
-	
-***************************************************************************************************************************
+MAke sure to run these commands using administration privileges.
 
 
 	PS C:\Windows\system32> Enable-PSRemoting -Force
@@ -112,3 +94,211 @@ TrustedHosts              *                                                     
 PS C:\Windows\system32> Invoke-Command -ScriptBlock {Get-Process} -ComputerName IE8WIN7 -Credential IEUser
 
 PS C:\Windows\system32> Invoke-Command -ScriptBlock {$env:Computername} -ComputerName IE8WIN7 -Credential IEUser
+
+
+
+Invoke-Command can be used with -ScriptBlock to run any commands on a remote PC.
+By default Get-Process does not support the usage of -Credential parameter 
+
+
+
+PS C:\Windows\system32> New-PSSession -ComputerName asif-PC -Credential asif
+
+ Id Name            ComputerName    State    ConfigurationName     Availability
+ -- ----            ------------    -----    -----------------     ------------
+  1 Session1        asif-pc         Opened   Microsoft.PowerShell     Available
+
+
+PS C:\Windows\system32> Get-PSSession
+
+ Id Name            ComputerName    State    ConfigurationName     Availability
+ -- ----            ------------    -----    -----------------     ------------
+  1 Session1        asif-pc         Opened   Microsoft.PowerShell     Available
+
+
+  
+PS C:\Windows\system32> Enter-PSSession -Id 1
+[asif-pc]: PS C:\Users\asif\Documents>
+
+
+*************************************************************************************
+ 253      36    85076      91688   544     1.56   8956 wsmprovhost
+ 
+ 
+ This process gets started when we start Powershell Remoting
+ 
+ 
+ 
+
+PS C:\Windows\system32> Invoke-Command -ScriptBlock {$env:Computername;(Get-Host).Version;Get-Process} -ComputerName asi
+f-PC -Credential asif
+ASIF-PC
+
+Major  Minor  Build  Revision PSComputerName
+-----  -----  -----  -------- --------------
+1      0      0      0        asif-pc
+
+Id             : 8436
+Handles        : 104
+CPU            : 0.0936006
+Name           : AdobeARM
+PSComputerName : asif-pc
+
+
+Id             : 2296
+Handles        : 162
+CPU            : 9.2976596
+Name           : AppleMobileDeviceService
+PSComputerName : asif-pc
+
+
+Id             : 9180
+Handles        : 238
+CPU            : 0.1092007
+Name           : armsvc
+PSComputerName : asif-pc
+
+
+Id             : 5552
+Handles        : 178
+CPU            :
+Name           : audiodg
+PSComputerName : asif-pc
+
+
+Id             : 4228
+Handles        : 737
+CPU            : 1.9344124
+Name           : bdagent
+PSComputerName : asif-pc
+
+
+Id             : 5512
+Handles        : 95
+CPU            : 0.0468003
+Name           : bdredline
+PSComputerName : asif-pc
+
+
+Id             : 1124
+Handles        : 1160
+CPU            : 139.152892
+Name           : bdservicehost
+PSComputerName : asif-pc
+
+ 
+ 
+ Running scripts which are on the local machine (attacker machine) on the target machine
+ 
+ PS C:\Windows\system32> Invoke-Command -FilePath 'D:\Pentester Academy\powershell\Gethotfix.ps1' -ComputerName asif-PC -credential asif
+
+ 
+If we want to run scripts which contain functions then we need to call the function inside the script itself eg. if we want to run the Show-HotFix.ps1 script, then we need to call the command Show-HotfixStatus after the function definition inside the script.
+
+
+
+Running own modules on the target machine
+
+PS C:\Windows\system32> Invoke-Command -FilePath 'D:\Pentester Academy\powershell\Show-HotFix\Show-HotFix.ps1' -ComputerName asif-PC -credential asif
+PS C:\Windows\system32> Import-Module Show-HotFix
+PS C:\Windows\system32> Get-Module
+
+ModuleType Name                      ExportedCommands
+---------- ----                      ----------------
+Script     Show-HotFix               Show-HotfixStatus
+
+
+PS C:\Windows\system32> Invoke-Command -ScriptBlock ${function:Show-HotFixStatus} -ComputerName asif-PC -credential asif
+
+
+Source        Description      HotFixID      InstalledBy          InstalledOn               PSComputerName
+------        -----------      --------      -----------          -----------               --------------
+ASIF-PC       Update           KB2735855                          9/16/2017 12:00:00 AM     asif-pc
+
+
+
+
+Running script on a list of servers with the same credentials 
+
+
+PS C:\Windows\system32> Invoke-Command -ScriptBlock ${function:Show-HotFixStatus} -ComputerName (Get-Content D:\servers.txt) -credential asif
+
+Source        Description      HotFixID      InstalledBy          InstalledOn               PSComputerName
+------        -----------      --------      -----------          -----------               --------------
+ASIF-PC       Update           KB2735855                          9/16/2017 12:00:00 AM     asif-pc
+ASIF-PC       Update           KB2735855                          9/16/2017 12:00:00 AM     asif-pc
+
+
+
+
+
+Creating a session on the multiple remote hosts 
+
+
+PS C:\Windows\system32> New-PSSession -ComputerName (Get-Content D:\servers.txt) -Credential asif
+
+ Id Name            ComputerName    State    ConfigurationName     Availability
+ -- ----            ------------    -----    -----------------     ------------
+  1 Session1        asif-pc         Opened   Microsoft.PowerShell     Available
+  2 Session2        asif-pc         Opened   Microsoft.PowerShell     Available
+
+
+Saving the session in a variable  
+  
+PS C:\Windows\system32> $sess=Get-PSSession
+
+Saving the processes in a variable
+PS C:\Windows\system32> Invoke-Command -ScriptBlock {$procs=Get-Process} -Session $sess
+PS C:\Windows\system32> Invoke-Command -ScriptBlock {$procs} -Session $sess
+
+Handles  NPM(K)    PM(K)      WS(K) VM(M)   CPU(s)     Id ProcessName                    PSComputerName
+-------  ------    -----      ----- -----   ------     -- -----------                    --------------
+    148      24     5792      11808   110     0.12   2312 AppleMobileDeviceService       asif-pc
+    148      24     5792      11808   110     0.12   2312 AppleMobileDeviceService       asif-pc
+     78       9     2420       4548    47     0.02   2232 armsvc                         asif-pc
+    178      13    20896      21200    80            1544 audiodg                        asif-pc
+    731      38    23224      10204   209     1.15   1888 bdagent                        asif-pc
+     78       9     2420       4548    47     0.02   2232 armsvc                         asif-pc
+     96      11     3136       6740    55     0.02   6696 bdredline                      asif-pc
+   1119      58    16636      36188   160     7.21   1200 bdservicehost                  asif-pc
+    178      13    20896      21200    80            1544 audiodg                        asif-pc
+    731      38    23224      10204   209     1.15   1888 bdagent                        asif-pc
+
+
+ 
+PS C:\Windows\system32> Invoke-Command -FilePath 'D:\Pentester Academy\powershell\Gethotfix.ps1' -Session $sess
+
+Source        Description      HotFixID      InstalledBy          InstalledOn               PSComputerName
+------        -----------      --------      -----------          -----------               --------------
+ASIF-PC       Update           KB2735855                          9/16/2017 12:00:00 AM     asif-pc
+ASIF-PC       Update           KB2735855                          9/16/2017 12:00:00 AM     asif-pc
+
+
+
+
+PS C:\Windows\system32> Invoke-Command {$hostname=Get-Host} -Session $sess
+PS C:\Windows\system32> Invoke-Command {$hostname} -Session $sess
+
+
+PSComputerName     : asif-pc
+RunspaceId         : 10e3d122-f6c2-4341-8b3d-ecff7e5d1a30
+PSShowComputerName : True
+Name               : ServerRemoteHost
+Version            : 1.0.0.0
+InstanceId         : b0fa12da-6f89-408f-acd7-8e2ab59933e1
+UI                 : System.Management.Automation.Internal.Host.InternalHostUserInterface
+CurrentCulture     : en-US
+CurrentUICulture   : en-US
+PrivateData        :
+
+PSComputerName     : asif-pc
+RunspaceId         : 3c1939a0-0e1a-427c-9eea-0747a5c30a0e
+PSShowComputerName : True
+Name               : ServerRemoteHost
+Version            : 1.0.0.0
+InstanceId         : d8496e8b-1149-455e-bb83-2a4367272e01
+UI                 : System.Management.Automation.Internal.Host.InternalHostUserInterface
+CurrentCulture     : en-US
+CurrentUICulture   : en-US
+PrivateData        :
+
