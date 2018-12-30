@@ -1,3 +1,25 @@
+Powershell Remoting to a Non-Domain Host
+
+    From an admin shell, enable PS remoting on the machine you wish to access:
+
+New-ItemProperty -Name LocalAccountTokenFilterPolicy `
+  -Path HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System 
+  -PropertyType DWord -Value 1
+
+Enable-PsRemoting -Force
+
+    From an admin shell, configure your client system to allow remote connections to non-domain machines
+
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value "*" -Force
+
+    Connect to the remote machine using the exact login credentials. For example, a local user would provide SERVER\username and password.
+
+$SERVER = 'REMOTE_SERVER'
+$USER   = 'REMOTE_USER'
+Set-ItemProperty 'HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds' ConsolePrompting $true
+Invoke-Command -Computer $SERVER -Credential (get-credential "$SERVER\$USER") { ls C:\ }
+
+
 PS C:\Users\asif> Get-HotFix -ComputerName asif-PC -Credential asif
 
 
