@@ -1,0 +1,539 @@
+listing namespaces available in the machine
+
+PS C:\Users\asif> Get-WmiObject -Namespace "root" -Class "__Namespace" |Select-Object Name
+
+Name
+----
+subscription
+DEFAULT
+CIMV2
+Cli
+nap
+SECURITY
+SecurityCenter2
+RSOP
+WMI
+directory
+Policy
+Interop
+ServiceModel
+SecurityCenter
+MSAPPS12
+Microsoft
+aspnet
+
+
+Listing the classes in a namespaces
+
+
+PS C:\Users\asif> Get-WmiObject -Namespace "root\CIMV2" -List
+
+
+   NameSpace: ROOT\CIMV2
+
+Name                                Methods              Properties
+----                                -------              ----------
+__NotifyStatus                      {}                   {StatusCode}
+__ExtendedStatus                    {}                   {Description, Operation, ParameterInfo, ProviderName...}
+Win32_PrivilegesStatus              {}                   {Description, Operation, ParameterInfo, PrivilegesNotHeld...}
+Win32_JobObjectStatus               {}                   {AdditionalDescription, Description, Operation, ParameterIn...
+__SecurityRelatedClass              {}                   {}
+__Trustee                           {}                   {Domain, Name, SID, SidLength...}
+Win32_Trustee                       {}                   {Domain, Name, SID, SidLength...}
+__NTLMUser9X                        {}                   {Authority, Flags, Mask, Name...}
+__ACE                               {}                   {AccessMask, AceFlags, AceType, GuidInheritedObjectType...}
+Win32_ACE                           {}                   {AccessMask, AceFlags, AceType, GuidInheritedObjectType...}
+__SecurityDescriptor                {}                   {ControlFlags, DACL, Group, Owner...}
+Win32_SecurityDescriptor            {}                   {ControlFlags, DACL, Group, Owner...}
+__PARAMETERS                        {}                   {}
+__SystemClass                       {}                   {}
+__ProviderRegistration              {}                   {provider}
+__EventProviderRegistration         {}                   {EventQueryList, provider}
+__ObjectProviderRegistration        {}                   {InteractionType, provider, QuerySupportLevels, SupportsBat...
+__ClassProviderRegistration         {}                   {CacheRefreshInterval, InteractionType, PerUserSchema, prov...
+
+.....................................
+......................................
+......................................
+
+
+
+Listing all methods in a class
+
+
+PS C:\Users\asif> Get-WmiObject -Class Win32_process -List | Select-Object -ExpandProperty Methods
+
+
+Name          : Create
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Constructor, Implemented, MappingStrings, Privileges...}
+
+Name          : Terminate
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Destructor, Implemented, MappingStrings, Privileges...}
+
+Name          : GetOwner
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : GetOwnerSid
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : SetPriority
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : AttachDebugger
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, ValueMap}
+
+
+
+
+
+
+PS C:\Users\asif> Get-WmiObject -Class Win32_process |select Name
+
+Name
+----
+System Idle Process
+System
+smss.exe
+csrss.exe
+wininit.exe
+csrss.exe
+winlogon.exe
+services.exe
+lsass.exe
+lsm.exe
+svchost.exe
+vsserv.exe
+svchost.exe
+bdservicehost.exe
+DevMgmtService.exe
+svchost.exe
+svchost.exe
+svchost.exe
+svchost.exe
+svchost.exe
+igfxCUIService.exe
+svchost.exe
+wlanext.exe
+conhost.exe
+
+Using WMI on a remote machine
+
+
+PS C:\Users\asif>  Get-WmiObject -Class Win32_process -ComputerName asif-PC -Credential asif
+
+OR 
+
+
+PS C:\Windows\system32> Invoke-Command -ScriptBlock {(Get-WmiObject -Class Win32_process | Select Name)} -ComputerName asif-PC -Credential asif
+
+Name                          PSComputerName                RunspaceId                               PSShowComputerName
+----                          --------------                ----------                               ------------------
+System Idle Process           asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+System                        asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+smss.exe                      asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+csrss.exe                     asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+wininit.exe                   asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+csrss.exe                     asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+winlogon.exe                  asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+services.exe                  asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+lsass.exe                     asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+lsm.exe                       asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+svchost.exe                   asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+vsserv.exe                    asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+svchost.exe                   asif-pc                       d110fcc6-41a7-45fa-a341-c6...                          True
+
+
+
+Using WMI allows to interact with remote machines where Powershell Remoting is not enabled  
+
+
+
+
+
+PS C:\Windows\system32> Invoke-Command -ScriptBlock {Get-WmiObject -Class Win32_process -Filter {Name="lsass.exe"}} -ComputerName asif-PC -Credential asif
+
+
+ProcessName                : lsass.exe
+Handles                    : 773
+VM                         : 46026752
+WS                         : 12681216
+Path                       : C:\Windows\system32\lsass.exe
+PSComputerName             : asif-pc
+RunspaceId                 : 6cb31541-c7c2-4f1c-b3af-98074eac46d6
+PSShowComputerName         : True
+__GENUS                    : 2
+__CLASS                    : Win32_Process
+__SUPERCLASS               : CIM_Process
+__DYNASTY                  : CIM_ManagedSystemElement
+__RELPATH                  : Win32_Process.Handle="772"
+__PROPERTY_COUNT           : 45
+__DERIVATION               : {CIM_Process, CIM_LogicalElement, CIM_ManagedSystemElement}
+__SERVER                   : ASIF-PC
+__NAMESPACE                : root\cimv2
+__PATH                     : \\ASIF-PC\root\cimv2:Win32_Process.Handle="772"
+Caption                    : lsass.exe
+CommandLine                : C:\Windows\system32\lsass.exe
+CreationClassName          : Win32_Process
+CreationDate               : 20181231101703.872420+330
+CSCreationClassName        : Win32_ComputerSystem
+CSName                     : ASIF-PC
+Description                : lsass.exe
+
+
+
+PS C:\Windows\system32> Get-WmiObject -Class Win32_Process | Where-Object {$_.Name -eq "lsass.exe" }
+
+
+__GENUS                    : 2
+__CLASS                    : Win32_Process
+__SUPERCLASS               : CIM_Process
+__DYNASTY                  : CIM_ManagedSystemElement
+__RELPATH                  : Win32_Process.Handle="772"
+__PROPERTY_COUNT           : 45
+__DERIVATION               : {CIM_Process, CIM_LogicalElement, CIM_ManagedSystemElement}
+__SERVER                   : ASIF-PC
+__NAMESPACE                : root\cimv2
+__PATH                     : \\ASIF-PC\root\cimv2:Win32_Process.Handle="772"
+Caption                    : lsass.exe
+
+
+
+PS C:\Windows\system32> Get-WmiObject -Query {Select * from Win32_Process where Name="lsass.exe"}
+
+
+__GENUS                    : 2
+__CLASS                    : Win32_Process
+__SUPERCLASS               : CIM_Process
+__DYNASTY                  : CIM_ManagedSystemElement
+__RELPATH                  : Win32_Process.Handle="772"
+__PROPERTY_COUNT           : 45
+__DERIVATION               : {CIM_Process, CIM_LogicalElement, CIM_ManagedSystemElement}
+__SERVER                   : ASIF-PC
+__NAMESPACE                : root\cimv2
+__PATH                     : \\ASIF-PC\root\cimv2:Win32_Process.Handle="772"
+
+
+
+PS C:\Windows\system32> Get-WmiObject -Query {Select ProcessId from Win32_Process where Name="lsass.exe"}
+
+
+__GENUS          : 2
+__CLASS          : Win32_Process
+__SUPERCLASS     :
+__DYNASTY        :
+__RELPATH        :
+__PROPERTY_COUNT : 1
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ProcessId        : 772
+
+
+
+Listing the executable path of every process running on the machine
+
+PS C:\Windows\system32> Get-WmiObject -Query {Select ExecutablePath from Win32_Process } | more
+
+
+__GENUS          : 2
+__CLASS          : Win32_Process
+__SUPERCLASS     :
+__DYNASTY        :
+__RELPATH        :
+__PROPERTY_COUNT : 1
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ExecutablePath   :
+
+__GENUS          : 2
+__CLASS          : Win32_Process
+__SUPERCLASS     :
+__DYNASTY        :
+__RELPATH        :
+__PROPERTY_COUNT : 1
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ExecutablePath   :
+
+__GENUS          : 2
+__CLASS          : Win32_Process
+__SUPERCLASS     :
+__DYNASTY        :
+__RELPATH        :
+__PROPERTY_COUNT : 1
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ExecutablePath   :
+
+
+
+
+PS C:\Windows\system32> Get-WmiObject -Class Win32_process -List| Select-Object -ExpandProperty Methods
+
+
+Name          : Create
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Constructor, Implemented, MappingStrings, Privileges...}
+
+Name          : Terminate
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Destructor, Implemented, MappingStrings, Privileges...}
+
+Name          : GetOwner
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : GetOwnerSid
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : SetPriority
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : AttachDebugger
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, ValueMap}
+
+
+
+PS C:\Windows\system32> Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList "notepad.exe"
+
+
+__GENUS          : 2
+__CLASS          : __PARAMETERS
+__SUPERCLASS     :
+__DYNASTY        : __PARAMETERS
+__RELPATH        :
+__PROPERTY_COUNT : 2
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ProcessId        : 3176
+ReturnValue      : 0
+
+
+
+Running on a remote machine
+
+PS C:\Windows\system32> Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList "notepad.exe"  -ComputerName asif-PC -Credential asif
+
+
+*******************************************************************************************************************************
+Try later
+PS C:\Windows\system32> PS C:\Windows\system32> Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList "powers
+hell.exe -c Get-Service"
+Get-Process : A positional parameter cannot be found that accepts argument 'C:\Windows\system32>'.
+At line:1 char:3
++ PS <<<<  C:\Windows\system32> Invoke-WmiMethod -Class Win32_Process -Name Create -ArgumentList "powershell.exe -c Get
+-Service"
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetProcessCommand
+
+
+*******************************************************************************************************************************
+
+
+check this on a remote machine
+
+PS C:\Windows\system32> Get-WmiObject -Class Win32_Process -Filter {Name = "powershell.exe" } -ComputerName asif-PC -Credential asif
+
+
+
+PS C:\Windows\system32> Get-WmiObject -Class Win32_Process -Filter {Name = "powershell.exe" }
+
+
+__GENUS                    : 2
+__CLASS                    : Win32_Process
+__SUPERCLASS               : CIM_Process
+__DYNASTY                  : CIM_ManagedSystemElement
+__RELPATH                  : Win32_Process.Handle="2192"
+__PROPERTY_COUNT           : 45
+__DERIVATION               : {CIM_Process, CIM_LogicalElement, CIM_ManagedSystemElement}
+__SERVER                   : ASIF-PC
+__NAMESPACE                : root\cimv2
+__PATH                     : \\ASIF-PC\root\cimv2:Win32_Process.Handle="2192"
+Caption                    : powershell.exe
+CommandLine                : "C:\WINDOWS\system32\WindowsPowerShell\v1.0\powershell.exe"
+CreationClassName          : Win32_Process
+CreationDate               : 20190101204327.709973+330
+CSCreationClassName        : Win32_ComputerSystem
+CSName                     : ASIF-PC
+Description                : powershell.exe
+ExecutablePath             : C:\WINDOWS\system32\WindowsPowerShell\v1.0\powershell.exe
+ExecutionState             :
+Handle                     : 2192
+HandleCount                : 617
+InstallDate                :
+KernelModeTime             : 4368028
+MaximumWorkingSetSize      : 1380
+MinimumWorkingSetSize      : 200
+Name                       : powershell.exe
+OSCreationClassName        : Win32_OperatingSystem
+OSName                     : Microsoft Windows 7 Ultimate |C:\Windows|\Device\Harddisk0\Partition3
+OtherOperationCount        : 5141
+
+
+
+PS C:\Windows\system32>  Get-WmiObject -Class win32_process -List | Select-Object -ExpandProperty methods
+
+
+Name          : Create
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Constructor, Implemented, MappingStrings, Privileges...}
+
+Name          : Terminate
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Destructor, Implemented, MappingStrings, Privileges...}
+
+Name          : GetOwner
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : GetOwnerSid
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : SetPriority
+InParameters  : System.Management.ManagementBaseObject
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, MappingStrings, ValueMap}
+
+Name          : AttachDebugger
+InParameters  :
+OutParameters : System.Management.ManagementBaseObject
+Origin        : Win32_Process
+Qualifiers    : {Implemented, ValueMap}
+
+
+
+
+PS C:\Windows\system32> Invoke-WmiMethod -Class win32_process -Name create -ArgumentList "cmd.exe"
+
+
+__GENUS          : 2
+__CLASS          : __PARAMETERS
+__SUPERCLASS     :
+__DYNASTY        : __PARAMETERS
+__RELPATH        :
+__PROPERTY_COUNT : 2
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ProcessId        : 6812
+ReturnValue      : 0
+
+
+running powershell on a remote machine
+
+PS C:\Windows\system32> Invoke-WmiMethod -Class win32_process -Name create -ArgumentList "cmd.exe" -ComputerName asif-Pc -Credential asif
+
+
+
+running powershell commands
+
+PS C:\Windows\system32> Invoke-WmiMethod -Class win32_process -Name create -ArgumentList "powershell.exe -c Get-Service"
+
+
+
+__GENUS          : 2
+__CLASS          : __PARAMETERS
+__SUPERCLASS     :
+__DYNASTY        : __PARAMETERS
+__RELPATH        :
+__PROPERTY_COUNT : 2
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ProcessId        : 4864
+ReturnValue      : 0
+
+
+
+
+check if notepad is running on the local machine 
+
+
+	PS C:\Windows\system32> Get-WmiObject -class win32_process -Filter { Name= "notepad.exe"}
+
+
+__GENUS                    : 2
+__CLASS                    : Win32_Process
+__SUPERCLASS               : CIM_Process
+__DYNASTY                  : CIM_ManagedSystemElement
+__RELPATH                  : Win32_Process.Handle="2272"
+__PROPERTY_COUNT           : 45
+__DERIVATION               : {CIM_Process, CIM_LogicalElement, CIM_ManagedSystemElement}
+__SERVER                   : ASIF-PC
+__NAMESPACE                : root\cimv2
+__PATH                     : \\ASIF-PC\root\cimv2:Win32_Process.Handle="2272"
+Caption                    : notepad.exe
+CommandLine                : "C:\Windows\system32\notepad.exe"
+CreationClassName          : Win32_Process
+CreationDate               : 20190103194628.386120+330
+CSCreationClassName        : Win32_ComputerSystem
+CSName                     : ASIF-PC
+Description                : notepad.exe
+ExecutablePath             : C:\Windows\system32\notepad.exe
+	
+	
+checking if notepad is running on remote machine
+
+
+PS C:\Windows\system32> Get-WmiObject -class win32_process -Filter { Name= "notepad.exe"} -ComputerName asif-PC -Credential asif
+
+
+Stopping the notepad.exe and checking again if it is running
+
+
+PS C:\Windows\system32> Get-WmiObject -class win32_process -Filter { Name= "notepad.exe"} | Remove-WmiObject
+PS C:\Windows\system32> Get-WmiObject -class win32_process -Filter { Name= "notepad.exe"}
