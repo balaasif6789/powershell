@@ -1,0 +1,144 @@
+PS C:\> Get-ChildItem REGISTRY::HKEY_CLASSES_ROOT\CLSID -Include PROGID -Recurse| foreach {$_.GetValue("")} |
+file
+StaticMetafile
+StaticDib
+clsid
+objref
+ADODB.Command.6.0
+ADODB.Parameter.6.0
+ADODB.Connection.6.0
+ADODB.Recordset.6.0
+ADODB.Error.6.0
+ADODB.ErrorLookup.6.0
+ADODB.Record.6.0
+ADODB.Stream.6.0
+ADOX.Catalog.6.0
+ADOX.Table.6.0
+ADOX.Group.6.0
+ADOX.User.6.0
+ADOX.Column.6.0
+ADOX.Index.6.0
+ADOX.Key.6.0
+lnkfile
+InternetExplorer.Application.1
+PBrush
+
+
+
+
+PS C:\>     Get-ChildItem REGISTRY::HKEY_CLASSES_ROOT\CLSID -Include PROGID -Recurse| foreach {$_.GetValue("")} | where
+{$_ -match "wscript" }
+WScript.Network.1
+WScript.Shell.1
+WScript.Shell.1
+WScript.Network.1
+PS C:\>
+
+
+
+
+PS C:\>     Get-ChildItem REGISTRY::HKEY_CLASSES_ROOT\CLSID -Include PROGID -Recurse| foreach {$_.GetValue("")} | where{$_ -match "wscript" }
+WScript.Network.1
+WScript.Shell.1
+WScript.Shell.1
+WScript.Network.1
+PS C:\> $wscript = New-Object -ComObject  WScript.Shell.1
+PS C:\> $wscript | Get-Member
+
+
+   TypeName: System.__ComObject#{41904400-be18-11d3-a28b-00104bd35090}
+
+Name                     MemberType            Definition
+----                     ----------            ----------
+AppActivate              Method                bool AppActivate (Variant, Variant)
+CreateShortcut           Method                IDispatch CreateShortcut (string)
+Exec                     Method                IWshExec Exec (string)
+ExpandEnvironmentStrings Method                string ExpandEnvironmentStrings (string)
+LogEvent                 Method                bool LogEvent (Variant, string, string)
+Popup                    Method                int Popup (string, Variant, Variant, Variant)
+RegDelete                Method                void RegDelete (string)
+RegRead                  Method                Variant RegRead (string)
+RegWrite                 Method                void RegWrite (string, Variant, Variant)
+Run                      Method                int Run (string, Variant, Variant)
+SendKeys                 Method                void SendKeys (string, Variant)
+Environment              ParameterizedProperty IWshEnvironment Environment (Variant) {get}
+CurrentDirectory         Property              string CurrentDirectory () {get} {set}
+SpecialFolders           Property              IWshCollection SpecialFolders () {get}
+
+
+PS C:\> $wscript.CurrentDirectory
+C:\Windows\system32
+PS C:\> $wscript.Exec
+
+
+MemberType          : Method
+OverloadDefinitions : {IWshExec Exec (string)}
+TypeNameOfValue     : System.Management.Automation.PSMethod
+Value               : IWshExec Exec (string)
+Name                : Exec
+IsInstance          : True
+
+
+PS C:\> $wscript.Exec("notepad.exe")
+
+
+Status    : 0
+StdIn     : System.__ComObject
+StdOut    : System.__ComObject
+StdErr    : System.__ComObject
+ProcessID : 21392
+ExitCode  : 0
+
+
+
+PS C:\> Get-ChildItem REGISTRY::HKEY_CLASSES_ROOT\CLSID -Include PROGID -Recurse| foreach {$_.GetValue("")} | where{$_ -match "Shell.Application" }
+Shell.Application.1
+PS C:\> $ShellApp = New-Object -ComObject shell.application.1
+PS C:\> $ShellApp | Get-Member
+
+
+   TypeName: System.__ComObject#{866738b9-6cf2-4de8-8767-f794ebe74f4e}
+
+Name                 MemberType Definition
+----                 ---------- ----------
+AddToRecent          Method     void AddToRecent (Variant, string)
+BrowseForFolder      Method     Folder BrowseForFolder (int, string, int, Variant)
+CanStartStopService  Method     Variant CanStartStopService (string)
+CascadeWindows       Method     void CascadeWindows ()
+ControlPanelItem     Method     void ControlPanelItem (string)
+EjectPC              Method     void EjectPC ()
+Explore              Method     void Explore (Variant)
+ExplorerPolicy       Method     Variant ExplorerPolicy (string)
+FileRun              Method     void FileRun ()
+FindComputer         Method     void FindComputer ()
+FindFiles            Method     void FindFiles ()
+FindPrinter          Method     void FindPrinter (string, string, string)
+GetSetting           Method     bool GetSetting (int)
+GetSystemInformation Method     Variant GetSystemInformation (string)
+Help                 Method     void Help ()
+IsRestricted         Method     int IsRestricted (string, string)
+IsServiceRunning     Method     Variant IsServiceRunning (string)
+MinimizeAll          Method     void MinimizeAll ()
+NameSpace            Method     Folder NameSpace (Variant)
+Open                 Method     void Open (Variant)
+RefreshMenu          Method     void RefreshMenu ()
+ServiceStart         Method     Variant ServiceStart (string, Variant)
+ServiceStop          Method     Variant ServiceStop (string, Variant)
+SetTime              Method     void SetTime ()
+ShellExecute         Method     void ShellExecute (string, Variant, Variant, Variant, Variant)
+ShowBrowserBar       Method     Variant ShowBrowserBar (string, Variant)
+ShutdownWindows      Method     void ShutdownWindows ()
+Suspend              Method     void Suspend ()
+TileHorizontally     Method     void TileHorizontally ()
+TileVertically       Method     void TileVertically ()
+ToggleDesktop        Method     void ToggleDesktop ()
+TrayProperties       Method     void TrayProperties ()
+UndoMinimizeALL      Method     void UndoMinimizeALL ()
+Windows              Method     IDispatch Windows ()
+WindowsSecurity      Method     void WindowsSecurity ()
+WindowSwitcher       Method     void WindowSwitcher ()
+Application          Property   IDispatch Application () {get}
+Parent               Property   IDispatch Parent () {get}
+
+
+
